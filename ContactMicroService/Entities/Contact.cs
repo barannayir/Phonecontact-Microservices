@@ -7,6 +7,7 @@ namespace ContactMicroService.Entities
     public class Contact
     {
         [BsonId]
+        [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
         public string uuid { get; set; }
         public string Ad { get; set; }
         public string Soyad { get; set; }
