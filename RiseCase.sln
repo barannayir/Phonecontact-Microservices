@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ContactMicroService", "ContactMicroService\ContactMicroService.csproj", "{50BE5167-0E00-4DE5-A195-8181A5D870C5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2F41DF8A-F2C7-4329-97DB-249EB6313248}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiGateway", "ApiGateway", "{22C6B37E-12E9-40CA-9D45-0EF469A08D82}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{ABC1B43B-7B06-44D2-9917-B794796FDB29}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApp", "WebApp", "{94B3ECA7-E124-4D5A-B190-7D4282ECB279}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ContactService", "ContactService", "{69F43354-53A8-401D-A7DF-0205A4DC6CD4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ReportService", "ReportService", "{B966AA5B-ABCE-45A7-BB8B-BF879F76BC0A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{50BE5167-0E00-4DE5-A195-8181A5D870C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50BE5167-0E00-4DE5-A195-8181A5D870C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50BE5167-0E00-4DE5-A195-8181A5D870C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50BE5167-0E00-4DE5-A195-8181A5D870C5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{50BE5167-0E00-4DE5-A195-8181A5D870C5} = {69F43354-53A8-401D-A7DF-0205A4DC6CD4}
+		{22C6B37E-12E9-40CA-9D45-0EF469A08D82} = {2F41DF8A-F2C7-4329-97DB-249EB6313248}
+		{ABC1B43B-7B06-44D2-9917-B794796FDB29} = {2F41DF8A-F2C7-4329-97DB-249EB6313248}
+		{94B3ECA7-E124-4D5A-B190-7D4282ECB279} = {2F41DF8A-F2C7-4329-97DB-249EB6313248}
+		{69F43354-53A8-401D-A7DF-0205A4DC6CD4} = {ABC1B43B-7B06-44D2-9917-B794796FDB29}
+		{B966AA5B-ABCE-45A7-BB8B-BF879F76BC0A} = {ABC1B43B-7B06-44D2-9917-B794796FDB29}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {72D67B38-8014-4162-8ACD-DB65906DCBAF}
+	EndGlobalSection
+EndGlobal
