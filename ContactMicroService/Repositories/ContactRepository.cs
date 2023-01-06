@@ -34,9 +34,9 @@ namespace ContactMicroService.Repositories
             return await _context.Contacts.Find(c => c.uuid == uuid).FirstOrDefaultAsync();
         }
 
-        public Task<IEnumerable<Contact>> GetContacts()
+        public async Task<IEnumerable<Contact>> GetContacts()
         {
-            throw new System.NotImplementedException();
+            return await _context.Contacts.Find(c => true).ToListAsync();
         }
 
         public async Task<IEnumerable<Contact>> GetContactsByAd(string ad)
@@ -53,13 +53,14 @@ namespace ContactMicroService.Repositories
 
         public async Task<IEnumerable<Contact>> GetContactsByLocation(string location)
         {
-            var filter = Builders<Contact>.Filter.Eq("ContactLocation.Location", location);
-            return await _context.Find(filter).ToListAsync();
+            var filter = Builders<Contact>.Filter.ElemMatch(a => a.Location, location);
+            return await _context.Contacts.Find(filter).ToListAsync();
+
         }
 
-        public async Task<IEnumerable<Contact>> GetContactsByPhoneNumber(string phoneNumber)
+        public async Task<Contact> GetContactsByPhoneNumber(string phoneNumber)
         {
-            throw new System.NotImplementedException();
+            return await _context.Contacts.Find(c => c.PhoneNumber == phoneNumber).FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Contact>> GetContactsBySoyad(string soyad)

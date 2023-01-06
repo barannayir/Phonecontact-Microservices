@@ -12,7 +12,7 @@ namespace ContactMicroService.Repositories.Interfaces
         Task<IEnumerable<Contact>> GetContactsByFirma(string firma);
         Task<IEnumerable<Contact>> GetContactsByAd(string ad);
         Task<IEnumerable<Contact>> GetContactsBySoyad(string soyad);
-        Task<IEnumerable<Contact>> GetContactsByPhoneNumber(string phoneNumber);
+        Task<Contact> GetContactsByPhoneNumber(string phoneNumber);
 
 
         Task CreateContact(Contact contact);

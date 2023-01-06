@@ -1,5 +1,7 @@
 using ContactMicroService.Data;
 using ContactMicroService.Data.Interfaces;
+using ContactMicroService.Repositories;
+using ContactMicroService.Repositories.Interfaces;
 using ContactMicroService.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -36,6 +38,9 @@ namespace ContactMicroService
             services.AddSingleton<IContactDatabaseSettings>(sp => sp.GetRequiredService<IOptions<ContactDatabaseSettings>>().Value);
 
             services.AddTransient<IContactContext, ContactContext>();
+            services.AddTransient<IContactRepository, ContactRepository>();
+
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ContactMicroService", Version = "v1" });

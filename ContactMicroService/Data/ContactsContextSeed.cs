@@ -25,47 +25,29 @@ namespace ContactMicroService.Data
                     Ad = "Baran",
                     Soyad = "Nayır",
                     Firma = "A Firması",
-                    ContactInformation = new List<ContactInformation>()
-                    {
-                        new ContactInformation()
-                        {
                             PhoneNumber = "0532 123 45 67",
                             Email = "barannayir@gmail.com",
                             Location = "İstanbul"
-                        }
-                    }
                 },
                 new Contact(){
                     uuid= "2",
                     Ad = "Ahmet",
                     Soyad = "Nayır",
                     Firma = "A Firması",
-                    ContactInformation = new List<ContactInformation>()
-                    {
-                        new ContactInformation()
-                        {
                             PhoneNumber = "0532 123 45 67",
                             Email = "ahmet@gmail.com",
                             Location = "Ankara"
-                        }
-                    }
                 },
                 new Contact(){
                     uuid= "3",
                     Ad = "Mehmet",
                     Soyad = "Nayır",
                     Firma = "A Firması",
-                    ContactInformation = new List<ContactInformation>()
-                    {
-                        new ContactInformation()
-                        {
+                   
                             PhoneNumber = "0532 123 45 67",
                             Email = "mehmet@gmail.com",
-                            Location = "İstanbul"
-                        }
-                    }
+                            Location = "İstanbul" 
                 }
-
             };
         }
     }
