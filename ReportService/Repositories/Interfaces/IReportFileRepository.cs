@@ -2,7 +2,7 @@
 
 namespace ReportService.Repositories.Interfaces
 {
-    public interface IReportFileRepository : IReportRepository<Report>
+    public interface IReportFileRepository : IReportRepository
     {
     }
 }

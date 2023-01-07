@@ -6,10 +6,11 @@ namespace ContactMicroService.Entities
 {
     public class Report
     {
-        public int uuid { get; set; }
+        public string uuid { get; set; }
         public string FileName { get; set; }
         public string FilePath { get; set; }
         public bool IsCompleted { get; set; }
+        public string Status { get; set; }
 
     }
 

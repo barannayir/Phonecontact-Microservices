@@ -12,5 +12,6 @@ namespace ReportBackgroundService.Models
         public string FileName { get; set; }
         public string FilePath { get; set; }
         public bool IsCompleted { get; set; }
+        public string Status { get; set; }
     }
 }

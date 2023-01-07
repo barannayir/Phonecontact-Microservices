@@ -26,8 +26,7 @@ namespace ReportService.Repositories
 
         public void Dispose()
         {
-      
-            GC.SuppressFinalize(this);
+          
         }
 
     }

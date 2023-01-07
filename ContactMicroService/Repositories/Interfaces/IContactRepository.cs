@@ -14,7 +14,6 @@ namespace ContactMicroService.Repositories.Interfaces
         Task<IEnumerable<Contact>> GetContactsBySoyad(string soyad);
         Task<Contact> GetContactsByPhoneNumber(string phoneNumber);
 
-
         Task CreateContact(Contact contact);
         Task<bool> UpdateContact(Contact contact);
         Task<bool> DeleteContact(string uuid);

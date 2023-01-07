@@ -1,6 +1,8 @@
 ﻿using ContactMicroService.Entities;
 using ContactMicroService.Repositories;
 using ContactMicroService.Repositories.Interfaces;
+using ContactMicroService.Services;
+using ContactMicroService.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections;
@@ -18,11 +20,13 @@ namespace ContactMicroService.Controllers
     {
         private readonly IContactRepository _contactRepository;
         private readonly ILogger<ContactController> _logger;
+        private readonly IReportRequest _reportRequest;
 
-        public ContactController(IContactRepository contactRepository ,ILogger<ContactController> logger)
+        public ContactController(IContactRepository contactRepository ,ILogger<ContactController> logger, ReportRequest reportRequest)
         {
             _contactRepository = contactRepository;
             _logger = logger;
+            _reportRequest = reportRequest;
         }
 
         [HttpGet]
@@ -55,6 +59,12 @@ namespace ContactMicroService.Controllers
             return CreatedAtRoute("GetContact", new { uuid = contact.uuid }, contact);
         }
 
+        [HttpPost]
+        [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.Created)]
+        public async Task<ActionResult<Contact>> CreateReportRequest([FromBody] Contact contact)
+        {
+            return Ok(await _reportRequest.SendReportRequest(contact));
+        }
 
         [HttpPut]
         [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]

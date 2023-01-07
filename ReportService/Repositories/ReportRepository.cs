@@ -7,36 +7,41 @@ using System.Threading.Tasks;
 
 namespace ReportService.Repositories
 {
-    public class ReportRepository<T> : IReportRepository<T> where T : class
+    public class ReportRepository<T> : IReportRepository
     {
         private readonly ReportContext _dbContext;
 
-        public Task<T> AddAsync(T entity)
+        public Task AddAsync(ReportBackgroundService.Models.Report report)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task DeleteAsync(T entity)
+        public Task DeleteAsync(ReportBackgroundService.Models.Report report)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<bool> ExistsAsync(int id)
+        public Task ExistsAsync(int id)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<IReadOnlyList<T>> GetAllAsync()
+        public Task GetAllAsync()
         {
             throw new System.NotImplementedException();
         }
 
-        public Task<T> GetAsync(int id)
+        public Task GetAsync(int id)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task UpdateAsync(T entity)
+        public Task Update(ReportBackgroundService.Models.Report report)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task UpdateAsync(ReportBackgroundService.Models.Report report)
         {
             throw new System.NotImplementedException();
         }

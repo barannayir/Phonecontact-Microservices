@@ -1,4 +1,5 @@
 ﻿using ContactMicroService.Entities;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace ContactMicroService.Data
             return new List<Contact>()
             {
                 new Contact(){
-                    uuid= "1",
+                    uuid= ObjectId.GenerateNewId().ToString(),
                     Ad = "Baran",
                     Soyad = "Nayır",
                     Firma = "A Firması",
@@ -30,7 +31,7 @@ namespace ContactMicroService.Data
                             Location = "İstanbul"
                 },
                 new Contact(){
-                    uuid= "2",
+                    uuid= ObjectId.GenerateNewId().ToString(),
                     Ad = "Ahmet",
                     Soyad = "Nayır",
                     Firma = "A Firması",
@@ -39,7 +40,7 @@ namespace ContactMicroService.Data
                             Location = "Ankara"
                 },
                 new Contact(){
-                    uuid= "3",
+                    uuid= ObjectId.GenerateNewId().ToString(),
                     Ad = "Mehmet",
                     Soyad = "Nayır",
                     Firma = "A Firması",
