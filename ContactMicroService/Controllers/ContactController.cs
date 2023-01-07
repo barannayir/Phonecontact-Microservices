@@ -1,5 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ContactMicroService.Entities;
+using ContactMicroService.Repositories;
+using ContactMicroService.Repositories.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using System.Collections;
 using System.Collections.Generic;
+using System.Net;
+using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -9,36 +16,60 @@ namespace ContactMicroService.Controllers
     [ApiController]
     public class ContactController : ControllerBase
     {
-        // GET: api/<ContactController>
+        private readonly IContactRepository _contactRepository;
+        private readonly ILogger<ContactController> _logger;
+
+        public ContactController(IContactRepository contactRepository ,ILogger<ContactController> logger)
+        {
+            _contactRepository = contactRepository;
+            _logger = logger;
+        }
+
         [HttpGet]
-        public IEnumerable<string> Get()
+        [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<IEnumerable<Contact>>> GetContacts()
         {
-            return new string[] { "value1", "value2" };
+            var contacts = await _contactRepository.GetContacts();
+            return Ok(contacts);
         }
 
-        // GET api/<ContactController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpGet("{uuid:length(24)}", Name = "GetContact")]
+        [ProducesResponseType((int)(HttpStatusCode.NotFound))]
+        [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
+        public async Task<ActionResult<Contact>> Get(string uuid)
         {
-            return "value";
+            var contact = await _contactRepository.GetContact(uuid);
+            if (contact == null)
+            {
+                _logger.LogError($"Contact with uuid: {uuid}, not found.");
+                return NotFound();
+            }
+            return Ok(contact);
         }
 
-        // POST api/<ContactController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.Created)]
+        public async Task<ActionResult<Contact>> CreateContact([FromBody] Contact contact)
         {
+            await _contactRepository.CreateContact(contact);
+            return CreatedAtRoute("GetContact", new { uuid = contact.uuid }, contact);
         }
 
-        // PUT api/<ContactController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+
+        [HttpPut]
+        [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> UpdateContact([FromBody] Contact contact)
         {
+            return Ok(await _contactRepository.UpdateContact(contact));
         }
 
-        // DELETE api/<ContactController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+
+        [HttpDelete("{uuid:length(24)}")]
+        [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
+
+        public async Task<IActionResult> DeleteContactById(string uuid)
         {
+            return Ok(await _contactRepository.DeleteContact(uuid));
         }
     }
 }

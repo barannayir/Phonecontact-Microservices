@@ -43,10 +43,9 @@ namespace ContactMicroService.Data
                     Ad = "Mehmet",
                     Soyad = "Nayır",
                     Firma = "A Firması",
-                   
                             PhoneNumber = "0532 123 45 67",
                             Email = "mehmet@gmail.com",
-                            Location = "İstanbul" 
+                            Location = "İstanbul"
                 }
             };
         }
