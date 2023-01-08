@@ -1,11 +1,10 @@
-﻿using ContactMicroService.Entities;
-using MongoDB.Driver;
-using ReportMicroService.Entities;
+﻿using MongoDB.Driver;
+using ReportService.Entities;
 
-namespace ContactMicroService.Data.Interfaces
+namespace ReportService.Data.Interfaces
 {
     public interface IReportContext
     {
-        IMongoCollection<Report> Reports { get;  }
+        IMongoCollection<Report> Reports { get; }
     }
 }

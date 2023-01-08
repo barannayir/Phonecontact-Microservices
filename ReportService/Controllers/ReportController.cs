@@ -1,12 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using ReportService.Services.Interfaces;
-using ContactMicroService.Entities;
-using ContactMicroService.Data.Interfaces;
-using System.Threading.Tasks;
-using ContactMicroService.Services;
-using ReportMicroService.Entities;
 using ReportService.Entities;
+using ReportService.Entities.Dtos;
+using ReportService.Repositories.Interfaces;
+using System.Threading.Tasks;
+
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace ReportService.Controllers
@@ -15,54 +12,43 @@ namespace ReportService.Controllers
     [ApiController]
     public class ReportController : ControllerBase
     {
+        private readonly IReportRepository _reportService;
+        private readonly IRabbitMQPublisherService _rabbitMQPublisherService;
 
-        private readonly IReportService _reportService;
-        private readonly IMessageProducer _messagePublisher;
-        private readonly IContactContext _contactContext;
-
-
-        [Route("ReportRequest")]
-        [HttpGet]
-        public async Task<IActionResult> GetReportRequest([FromBody] Entities.Dtos.ReportRequest request)
+        public ReportController(IReportRepository reportService, IRabbitMQPublisherService rabbitMQPublisherService)
         {
-            try
-            {
-                var reportId = await _reportService.Add(request);
-                _messagePublisher.SendMessage(new GenerateReport
-                {
-                    ReportId = reportId,
-                    Status = "ReportCreating"
-                });
-                return Ok(
-                     "Report request sent " + reportId.ToString()
-                );
+            _reportService = reportService;
+            _rabbitMQPublisherService = rabbitMQPublisherService;
+        }
 
-            }
-            catch (Exception ex)
-            {
-                return Ok(ex.Message);
-            }
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var response = await _reportService.GetAllAsync();
+            return CreateActionResultInstance(response);
         }
 
         [HttpGet("{id}")]
-        public string Get(int id)
+        public async Task<IActionResult> GetById(string id)
         {
-            return "value";
+            var response = await _reportService.GetByIdAsync(id);
+            return CreateActionResultInstance(response);
         }
 
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task<IActionResult> Create()
         {
+            var response = await _reportService.CreateAsync();
+            _rabbitMQPublisherService.Publish(new CreateReportEvent(response.Data.Id),
+                Constant.ReportQueue, Constant.ReportRouting, Constant.ReportExchange);
+            return CreateActionResultInstance(response);
         }
 
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut]
+        public async Task<IActionResult> Update(ReportDto report)
         {
-        }
-
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            var response = await _reportService.UpdateAsync(report);
+            return CreateActionResultInstance(response);
         }
     }
 }

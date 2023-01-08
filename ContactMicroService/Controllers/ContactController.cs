@@ -1,16 +1,8 @@
-﻿using ContactMicroService.Entities;
-using ContactMicroService.Repositories;
+﻿using ContactMicroService.Entities.Dtos;
 using ContactMicroService.Repositories.Interfaces;
-using ContactMicroService.Services;
-using ContactMicroService.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Collections;
-using System.Collections.Generic;
-using System.Net;
+using Shared.BaseController;
 using System.Threading.Tasks;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace ContactMicroService.Controllers
 {
@@ -18,68 +10,54 @@ namespace ContactMicroService.Controllers
     [ApiController]
     public class ContactController : ControllerBase
     {
-        private readonly IContactRepository _contactRepository;
-        private readonly ILogger<ContactController> _logger;
-        private readonly IReportRequest _reportRequest;
+        private readonly IContactRepository _contactService;
 
-        public ContactController(IContactRepository contactRepository ,ILogger<ContactController> logger, ReportRequest reportRequest)
+        public ContactController(IContactRepository contactService)
         {
-            _contactRepository = contactRepository;
-            _logger = logger;
-            _reportRequest = reportRequest;
+            _contactService = contactService;
         }
 
         [HttpGet]
-        [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<IEnumerable<Contact>>> GetContacts()
+        public async Task<IActionResult> GetAll()
         {
-            var contacts = await _contactRepository.GetContacts();
-            return Ok(contacts);
+            var response = await _contactService.GetAllAsync();
+            return CustomBaseController.CreateActionResultInstance(response);
         }
 
-        [HttpGet("{uuid:length(24)}", Name = "GetContact")]
-        [ProducesResponseType((int)(HttpStatusCode.NotFound))]
-        [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
-        public async Task<ActionResult<Contact>> Get(string uuid)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(string id)
         {
-            var contact = await _contactRepository.GetContact(uuid);
-            if (contact == null)
-            {
-                _logger.LogError($"Contact with uuid: {uuid}, not found.");
-                return NotFound();
-            }
-            return Ok(contact);
+            var response = await _contactService.GetById(id);
+            return CreateActionResultInstance(response);
         }
 
         [HttpPost]
-        [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.Created)]
-        public async Task<ActionResult<Contact>> CreateContact([FromBody] Contact contact)
+        public async Task<IActionResult> Create(ContactCreateDto contact)
         {
-            await _contactRepository.CreateContact(contact);
-            return CreatedAtRoute("GetContact", new { uuid = contact.uuid }, contact);
-        }
-
-        [HttpPost]
-        [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.Created)]
-        public async Task<ActionResult<Contact>> CreateReportRequest([FromBody] Contact contact)
-        {
-            return Ok(await _reportRequest.SendReportRequest(contact));
+            var response = await _contactService.CreateAsync(contact);
+            return CreateActionResultInstance(response);
         }
 
         [HttpPut]
-        [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> UpdateContact([FromBody] Contact contact)
+        public async Task<IActionResult> Update(ContactUpdateDto contact)
         {
-            return Ok(await _contactRepository.UpdateContact(contact));
+            var response = await _contactService.UpdateAsync(contact);
+            return CreateActionResultInstance(response);
         }
 
-
-        [HttpDelete("{uuid:length(24)}")]
-        [ProducesResponseType(typeof(Contact), (int)HttpStatusCode.OK)]
-
-        public async Task<IActionResult> DeleteContactById(string uuid)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteById(string id)
         {
-            return Ok(await _contactRepository.DeleteContact(uuid));
+            var response = await _contactService.DeleteAsync(id);
+            return CreateActionResultInstance(response);
+        }
+
+        [HttpGet]
+        [Route("GetContactStatistics")]
+        public async Task<IActionResult> GetAllReportData()
+        {
+            var response = await _contactService.GetAllContactWithCommunicationsAsync();
+            return CreateActionResultInstance(response);
         }
     }
 }

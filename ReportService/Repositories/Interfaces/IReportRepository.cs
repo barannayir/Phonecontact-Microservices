@@ -1,17 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using ReportService.Entities.Dtos;
+using Shared.Dtos;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using ReportMicroService.Entities;
 
 namespace ReportService.Repositories.Interfaces
 {
     public interface IReportRepository
     {
-        Task<Report> GetAsync(string id);
-        Task GetAllAsync();
-        Task ExistsAsync(string id);
-        Task AddAsync(Report report);
-        Task<bool> UpdateAsync(Report report);
-        Task<bool> DeleteAsync(Report report);
-        Task<bool> Update(Report report);
+        Task<Response<List<ReportDto>>> GetAllAsync();
+
+        Task<Response<ReportDto>> GetByIdAsync(string id);
+
+        Task<Response<ReportDto>> CreateAsync();
+
+        Task<Response<NoContent>> UpdateAsync(ReportDto reportDto);
+
+        Task<Response<NoContent>> DeleteAsync(string id);
     }
 }

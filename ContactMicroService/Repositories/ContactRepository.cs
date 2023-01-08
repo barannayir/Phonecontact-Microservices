@@ -1,78 +1,105 @@
-﻿using ContactMicroService.Data;
-using ContactMicroService.Data.Interfaces;
-using ContactMicroService.Entities;
+﻿using AutoMapper;
+using ContactMicroService.Entities.Dtos;
 using ContactMicroService.Repositories.Interfaces;
+using ContactMicroService.Settings;
 using MongoDB.Driver;
+using Shared.Dtos;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using MongoDB.Driver;
-using System.Runtime.Intrinsics.X86;
+using ContactModel = ContactMicroService.Entities.Contact;
 
 namespace ContactMicroService.Repositories
 {
     public class ContactRepository : IContactRepository
     {
-        public readonly IContactContext _context;
-        public ContactRepository(IContactContext context)
-        {
-            _context = context;
-        }
-        public async Task CreateContact(Contact contact)
-        {
-            await _context.Contacts.InsertOneAsync(contact);
-        }
+        private readonly IMongoCollection<ContactModel> _contactCollection;
+        private readonly ICommunicationRepository _communicationService;
+        private readonly IMapper _mapper;
 
-        public async Task<bool> DeleteContact(string uuid)
+        public ContactRepository(IMapper mapper, IDatabaseSettings databaseSettings, ICommunicationRepository communicationService)
         {
-            var filter = Builders<Contact>.Filter.Eq(m => m.uuid, uuid);
-            DeleteResult deleteResult = await _context.Contacts.DeleteOneAsync(filter);
-            return deleteResult.IsAcknowledged && deleteResult.DeletedCount > 0;    
+            var client = new MongoClient(databaseSettings.ConnectionStrings);
+            var database = client.GetDatabase(databaseSettings.DatabaseName);
+            _contactCollection = database.GetCollection<ContactModel>(databaseSettings.ContactCollectionName);
+            _mapper = mapper;
+            _communicationService = communicationService;
         }
 
-        public async Task<Contact> GetContact(string uuid)
+        public async Task<Response<List<ContactDto>>> GetAllAsync()
         {
-            return await _context.Contacts.Find(c => c.uuid == uuid).FirstOrDefaultAsync();
+            var contacts = await _contactCollection.Find(x => true).ToListAsync();
+            return Response<List<ContactDto>>.Success(_mapper.Map<List<ContactDto>>(contacts), 200);
         }
 
-        public async Task<IEnumerable<Contact>> GetContacts()
+        public async Task<Response<List<ContactStatisticsDto>>> GetAllContactWithCommunicationsAsync()
         {
-            return await _context.Contacts.Find(c => true).ToListAsync();
+            List<ContactStatisticsDto> contactStatistics = new List<ContactStatisticsDto>();
+            var contacts = await _contactCollection.Find(x => true).ToListAsync();
+            var contactIds = contacts.Select(x => x.Id).ToList();
+            var communications = (await _communicationService.GetAllByContactIdsAsync(contactIds)).Data;
+
+            var locationGroup = communications.Where(x => x.CommunicationType == CommunicationType.LOCATION)
+                .GroupBy(x => x.Address).Select(x => x.Key).ToList();
+
+            locationGroup.ForEach(location =>
+            {
+                var contactIdsOfLocation = communications.Where(x => x.Address == location && x.CommunicationType == CommunicationType.LOCATION)
+                .Select(x => x.ContactId).Distinct().ToList();//Same contact filtered.
+
+                var phoneCountOfLocation = communications.Where(x => contactIdsOfLocation.Contains(x.ContactId) && x.CommunicationType == CommunicationType.PHONE)
+                .Select(x => x.Address).Distinct().Count();//Same phone filtered.
+
+                contactStatistics.Add(new ContactStatisticsDto
+                {
+                    Location = location,
+                    ContactCount = contactIdsOfLocation.Count,
+                    PhoneCount = phoneCountOfLocation
+                });
+            });
+
+            return Response<List<ContactStatisticsDto>>.Success(contactStatistics, 200);
         }
 
-        public async Task<IEnumerable<Contact>> GetContactsByAd(string ad)
+        public async Task<Response<ContactWithCommunicationsDto>> GetById(string id)
         {
-            var filter = Builders<Contact>.Filter.Eq(a => a.Ad, ad);
-            return await _context.Contacts.Find(filter).ToListAsync();
+            var contact = await _contactCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+            if (contact == null)
+            {
+                return Response<ContactWithCommunicationsDto>.Fail("Contact not found!", 404);
+            }
+            var contactDto = _mapper.Map<ContactWithCommunicationsDto>(contact);
+            var communicationsResponse = await _communicationService.GetAllByContactIdAsync(contact.Id);
+            contactDto.Communications = communicationsResponse.Data;
+            return Response<ContactWithCommunicationsDto>.Success(contactDto, 200);
         }
 
-        public async Task<IEnumerable<Contact>> GetContactsByFirma(string firma)
+        public async Task<Response<ContactDto>> CreateAsync(ContactCreateDto contact)
         {
-            var filter = Builders<Contact>.Filter.Eq(a => a.Firma, firma);
-            return await _context.Contacts.Find(filter).ToListAsync();
+            var newContact = _mapper.Map<ContactModel>(contact);
+            await _contactCollection.InsertOneAsync(newContact);
+            return Response<ContactDto>.Success(_mapper.Map<ContactDto>(newContact), 200);
         }
 
-        public async Task<IEnumerable<Contact>> GetContactsByLocation(string location)
+        public async Task<Response<NoContent>> UpdateAsync(ContactUpdateDto contact)
         {
-            var filter = Builders<Contact>.Filter.ElemMatch(a => a.Location, location);
-            return await _context.Contacts.Find(filter).ToListAsync();
-
+            var updateContact = _mapper.Map<ContactModel>(contact);
+            var result = await _contactCollection.FindOneAndReplaceAsync(x => x.Id == updateContact.Id, updateContact);
+            if (result == null)
+            {
+                return Response<NoContent>.Fail("Contact not found!", 404);
+            }
+            return Response<NoContent>.Success(204);
         }
 
-        public async Task<Contact> GetContactsByPhoneNumber(string phoneNumber)
+        public async Task<Response<NoContent>> DeleteAsync(string id)
         {
-            return await _context.Contacts.Find(c => c.PhoneNumber == phoneNumber).FirstOrDefaultAsync();
-        }
-
-        public async Task<IEnumerable<Contact>> GetContactsBySoyad(string soyad)
-        {
-            var filter = Builders<Contact>.Filter.Eq(s => s.Soyad, soyad);
-            return await _context.Contacts.Find(filter).ToListAsync();
-        }
-
-        public async Task<bool> UpdateContact(Contact contact)
-        {
-            var updateResult = await _context.Contacts.ReplaceOneAsync(filter: x => x.uuid == contact.uuid, replacement: contact);
-            return updateResult.IsAcknowledged && updateResult.ModifiedCount > 0;
+            var result = await _contactCollection.DeleteOneAsync(x => x.Id == id);
+            if (result.DeletedCount > 0)
+            {
+                return Response<NoContent>.Fail("Contact not found!", 404);
+            }
+            return Response<NoContent>.Success(204);
         }
     }
 }

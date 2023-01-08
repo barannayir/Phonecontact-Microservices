@@ -1,4 +1,5 @@
-﻿using ContactMicroService.Entities;
+﻿using ContactMicroService.Entities.Dtos;
+using Shared.Dtos;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -6,16 +7,16 @@ namespace ContactMicroService.Repositories.Interfaces
 {
     public interface IContactRepository
     {
-        Task<IEnumerable<Contact>> GetContacts();
-        Task<Contact> GetContact(string uuid);
-        Task<IEnumerable<Contact>> GetContactsByLocation(string location);
-        Task<IEnumerable<Contact>> GetContactsByFirma(string firma);
-        Task<IEnumerable<Contact>> GetContactsByAd(string ad);
-        Task<IEnumerable<Contact>> GetContactsBySoyad(string soyad);
-        Task<Contact> GetContactsByPhoneNumber(string phoneNumber);
+        Task<Response<List<ContactDto>>> GetAllAsync();
 
-        Task CreateContact(Contact contact);
-        Task<bool> UpdateContact(Contact contact);
-        Task<bool> DeleteContact(string uuid);
+        Task<Response<ContactWithCommunicationsDto>> GetById(string id);
+
+        Task<Response<List<ContactStatisticsDto>>> GetAllContactWithCommunicationsAsync();
+
+        Task<Response<ContactDto>> CreateAsync(ContactCreateDto contact);
+
+        Task<Response<NoContent>> UpdateAsync(ContactUpdateDto contact);
+
+        Task<Response<NoContent>> DeleteAsync(string id);
     }
 }

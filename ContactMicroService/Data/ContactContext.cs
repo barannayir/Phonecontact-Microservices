@@ -7,14 +7,14 @@ namespace ContactMicroService.Data
 {
     public class ContactContext : IContactContext
     {
-        public ContactContext(IContactDatabaseSettings settings)
+        public ContactContext(IDatabaseSettings settings)
         {
             var client = new MongoClient(settings.ConnectionStrings);
             var database = client.GetDatabase(settings.DatabaseName);
 
-            Contacts = database.GetCollection<Contact>(settings.CollectionName);
-            ContactsContextSeed.SeedData(Contacts);
+            Contacts = database.GetCollection<Contact>(settings.ContactCollectionName);
         }
-        public IMongoCollection<Contact> Contacts { get;  }
+
+        public IMongoCollection<Contact> Contacts { get; }
     }
 }

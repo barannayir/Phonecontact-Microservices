@@ -5,6 +5,6 @@ namespace ContactMicroService.Data.Interfaces
 {
     public interface IContactContext
     {
-        IMongoCollection<Contact> Contacts { get;  }
+        IMongoCollection<Contact> Contacts { get; }
     }
 }
