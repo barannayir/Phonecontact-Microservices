@@ -1,8 +1,8 @@
 ﻿using ContactMicroService.Data;
-using ContactMicroService.Data.Interfaces;
-using ContactMicroService.Entities;
+using MongoDB.Driver;
+using ReportMicroService.Entities;
 using ReportService.Repositories.Interfaces;
-using System.Collections.Generic;
+using System;
 using System.Threading.Tasks;
 
 namespace ReportService.Repositories
@@ -11,12 +11,17 @@ namespace ReportService.Repositories
     {
         private readonly ReportContext _dbContext;
 
-        public Task AddAsync(ReportBackgroundService.Models.Report report)
+        public ReportRepository(ReportContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
+        public Task AddAsync(Report report)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task DeleteAsync(ReportBackgroundService.Models.Report report)
+        public Task DeleteAsync(Report report)
         {
             throw new System.NotImplementedException();
         }
@@ -26,24 +31,48 @@ namespace ReportService.Repositories
             throw new System.NotImplementedException();
         }
 
+        public Task ExistsAsync(string id)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Task GetAllAsync()
         {
             throw new System.NotImplementedException();
         }
 
-        public Task GetAsync(int id)
+
+
+
+        public Task Update(Report report)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task Update(ReportBackgroundService.Models.Report report)
+        public Task UpdateAsync(Report report)
         {
             throw new System.NotImplementedException();
         }
 
-        public Task UpdateAsync(ReportBackgroundService.Models.Report report)
+        Task<bool> IReportRepository.DeleteAsync(Report report)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
+        }
+
+        async Task<Report> IReportRepository.GetAsync(string id)
+        {
+
+            return  await _dbContext.Reports.Find(c => c.uuid == id).FirstOrDefaultAsync();
+        }
+
+        Task<bool> IReportRepository.Update(Report report)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<bool> IReportRepository.UpdateAsync(Report report)
+        {
+            throw new NotImplementedException();
         }
     }
 }

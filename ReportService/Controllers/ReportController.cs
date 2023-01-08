@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using EventBusRabbitMQ.Events.Interfaces;
 using ReportService.Services.Interfaces;
 using ContactMicroService.Entities;
 using ContactMicroService.Data.Interfaces;
 using System.Threading.Tasks;
 using ContactMicroService.Services;
+using ReportMicroService.Entities;
+using ReportService.Entities;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace ReportService.Controllers
@@ -27,9 +28,9 @@ namespace ReportService.Controllers
             try
             {
                 var reportId = await _reportService.Add(request);
-                _messagePublisher.SendMessage(new Report
+                _messagePublisher.SendMessage(new GenerateReport
                 {
-                    uuid = reportId,
+                    ReportId = reportId,
                     Status = "ReportCreating"
                 });
                 return Ok(

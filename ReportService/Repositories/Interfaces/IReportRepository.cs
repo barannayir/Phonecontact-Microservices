@@ -1,17 +1,17 @@
-﻿using ReportBackgroundService.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using ReportMicroService.Entities;
 
 namespace ReportService.Repositories.Interfaces
 {
     public interface IReportRepository
     {
-        Task GetAsync(int id);
+        Task<Report> GetAsync(string id);
         Task GetAllAsync();
-        Task ExistsAsync(int id);
+        Task ExistsAsync(string id);
         Task AddAsync(Report report);
-        Task UpdateAsync(Report report);
-        Task DeleteAsync(Report report);
-        Task Update(Report report);
+        Task<bool> UpdateAsync(Report report);
+        Task<bool> DeleteAsync(Report report);
+        Task<bool> Update(Report report);
     }
 }

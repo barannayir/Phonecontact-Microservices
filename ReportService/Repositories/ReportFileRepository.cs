@@ -4,14 +4,14 @@ using ContactMicroService.Entities;
 using ReportService.Repositories.Interfaces;
 using System.Threading.Tasks;
 using System;
+using ReportMicroService.Entities;
 
 namespace ReportService.Repositories
 {
     public class ReportFileRepository: ReportRepository<Report>, IReportFileRepository
     {
-        private readonly ReportContext _dbContext;
-
-        public ReportFileRepository(ReportContext dbContext)
+        private readonly IReportContext _dbContext;
+        public ReportFileRepository(IReportContext dbContext) 
         {
             _dbContext = dbContext;
         }

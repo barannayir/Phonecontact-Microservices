@@ -2,5 +2,9 @@
 {
     public class ReportMapping
     {
+        public static void Map()
+        {
+           
+        }
     }
 }

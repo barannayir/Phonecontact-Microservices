@@ -13,9 +13,13 @@ using System.Threading.Tasks;
 using System.Linq;
 using OfficeOpenXml;
 using ReportService.Entities.Dtos;
-using ReportBackgroundService.Models;
 using ReportService.Http.Interface;
 using ReportService.Repositories.Interfaces;
+using ContactMicroService.Entities;
+using ContactMicroService.Data.Interfaces;
+using MongoDB.Driver;
+using ReportMicroService.Entities;
+using ReportService.Entities;
 
 namespace ReportService.Services
 {
@@ -26,6 +30,7 @@ namespace ReportService.Services
         private IModel _channel;
         private string _queueName;
         private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IContactContext _contactContext;
 
         public ReportBackgroundService(IConfiguration configuration, IServiceScopeFactory scopeFactory)
         {
@@ -60,7 +65,7 @@ namespace ReportService.Services
             {
                 var body = ea.Body;
                 var notification = Encoding.UTF8.GetString(body.ToArray());
-                var json = JsonConvert.DeserializeObject<Report>(notification);
+                var json = JsonConvert.DeserializeObject<GenerateReport>(notification);
                 if (json.Status == "ReportCreating")
                 {
                     CreateReport(notification);
@@ -70,37 +75,24 @@ namespace ReportService.Services
             return Task.CompletedTask;
         }
 
-        public void CreateReport(string reportMessage)
+        public async Task CreateReport(string reportMessage)
         {
             List<ReportResultDto> resultList = new List<ReportResultDto>();
             using (var scope = _scopeFactory.CreateScope())
             {
                 var repo = scope.ServiceProvider.GetRequiredService<IReportRepository>();
                 var contactClient = scope.ServiceProvider.GetRequiredService<IContactClient>();
-                var reportRequestDto = JsonConvert.DeserializeObject<Report>(reportMessage);
+                var reportRequestDto = JsonConvert.DeserializeObject<GenerateReport>(reportMessage);
                 try
                 {
-                    var reportObj = repo.Get(x => x.Uuid == reportRequestDto.uuid);
+                    var reportObj = await repo.GetAsync(reportRequestDto.ReportId);
 
                     var allInfos = contactClient.GetAllInformations().Result;
-
-                    var locations = allInfos.GroupBy(x => new { x.InformationType, x.Information })
-                    .Where(x => x.Key.InformationType == ReportEntities.Location).Select(x => x.Key.Information);
-                    foreach (var l in locations)
-                    {
-                        ReportResultDto locationResultDto = new ReportResultDto();
-                        locationResultDto.Location = l;
-                        locationResultDto.ContactCount = allInfos.Where(x => x.InformationType == ReportEntities.Location
-                         && x.Information == l).GroupBy(x => x.ContactUuid).Count();
-                        var locationContactIds = allInfos.Where(x => x.InformationType == ReportEntities.Location
-                       && x.Information == l).GroupBy(x => x.ContactUuid).Select(x => x.Key).ToList();
-                        resultList.Add(locationResultDto);
-                        locationResultDto.ContactNumber = allInfos.Where(x => x.InformationType == ReportEntities.PhoneNumber && locationContactIds.Contains(x.ContactUuid)).Count();
-                        resultList.Add(locationResultDto);
-                    }
+                    var filter = Builders<Contact>.Filter.Eq(a => a.Location, ReportEntities.Location);
+                    var locations = _contactContext.Contacts.Find(filter).ToListAsync();
 
                     var path = Path.Combine(Directory.GetCurrentDirectory(), "Reports");
-                    string fileName = $@"{reportRequestDto.uuid}.xlsx";
+                    string fileName = $@"{reportRequestDto.ReportId}.xlsx";
                     FileInfo file = new FileInfo(Path.Combine(path, fileName));
                     if (file.Exists)
                     {
@@ -111,9 +103,9 @@ namespace ReportService.Services
                     {
 
                         ExcelWorksheet _excel = pckg.Workbook.Worksheets.Add("Report");
-                        _excel.Cells[1, 1].Value = "Location Info";
-                        _excel.Cells[1, 2].Value = "Contact Count";
-                        _excel.Cells[1, 3].Value = "Contact Number";
+                        _excel.Cells[1, 1].Value = "Konum Bilgisi";
+                        _excel.Cells[1, 2].Value = "Kişi Sayısı";
+                        _excel.Cells[1, 3].Value = "Telefon Numarası";
 
 
                         for (int i = 0; i < resultList.Count; i++)
@@ -125,13 +117,15 @@ namespace ReportService.Services
                         }
                         pckg.Save();
                     }
-                    reportObj.ReportStat = ReportStatus.Completed;
-                    repo.Update(reportObj).Wait();
+                    reportObj.Status = ReportStatus.Completed;
+                    await repo.Update(reportObj).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
                 }
             }
         }
+
+        
     }
 }

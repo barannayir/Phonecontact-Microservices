@@ -1,4 +1,5 @@
 ﻿using ContactMicroService.Entities;
+using ReportMicroService.Entities;
 using System;
 using System.Threading.Tasks;
 

@@ -1,8 +1,8 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
+using ReportService.Entities.Dtos;
 using System;
 using System.Collections.Generic;
-
-namespace ContactMicroService.Entities
+namespace ReportMicroService.Entities
 {
     public class Report
     {
@@ -10,7 +10,8 @@ namespace ContactMicroService.Entities
         public string FileName { get; set; }
         public string FilePath { get; set; }
         public bool IsCompleted { get; set; }
-        public string Status { get; set; }
+        public ReportStatus Status { get; set; }
+        public string Location { get; set; }
 
     }
 
