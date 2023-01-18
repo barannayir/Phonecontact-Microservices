@@ -1,4 +1,6 @@
-﻿using ContactMicroService.Entities.Dtos;
+﻿
+
+using ContactMicroService.Entities.Dtos;
 using ContactMicroService.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Shared.BaseController;
@@ -8,7 +10,7 @@ namespace ContactMicroService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ContactController : ControllerBase
+    public class ContactController : CustomBaseController
     {
         private readonly IContactRepository _contactService;
 
@@ -21,7 +23,7 @@ namespace ContactMicroService.Controllers
         public async Task<IActionResult> GetAll()
         {
             var response = await _contactService.GetAllAsync();
-            return CustomBaseController.CreateActionResultInstance(response);
+            return CreateActionResultInstance(response);
         }
 
         [HttpGet("{id}")]

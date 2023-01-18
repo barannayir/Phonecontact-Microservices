@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
 using ReportService.Entities;
 using ReportService.Repositories;
 using ReportService.Repositories.Interfaces;
+using ReportService.Settings;
 using System;
 
 namespace ReportService
@@ -25,10 +27,10 @@ namespace ReportService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            
             services.AddScoped<IReportRepository, ReportRepository>();
             services.AddHttpClient();
 
+            services.AddScoped<IDatabaseSettings, DatabaseSettings>();
             services.AddSingleton<RabbitMQClientService>();
             services.AddSingleton<IRabbitMQPublisherService, RabbitMQPublisherService>();
             services.AddTransient<HttpClientService>();
@@ -36,6 +38,8 @@ namespace ReportService
             services.AddHostedService<ExcelReportBackgroundService>();
 
             services.Configure<MicroServices>(Configuration.GetSection("Microservices"));
+            services.Configure<DatabaseSettings>(Configuration.GetSection("ReportingDatabaseSettings"));
+            services.AddSingleton<IDatabaseSettings>(sp => sp.GetRequiredService<IOptions<DatabaseSettings>>().Value);
 
 
 

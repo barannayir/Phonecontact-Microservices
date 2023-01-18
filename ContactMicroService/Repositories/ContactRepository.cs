@@ -45,10 +45,10 @@ namespace ContactMicroService.Repositories
             locationGroup.ForEach(location =>
             {
                 var contactIdsOfLocation = communications.Where(x => x.Address == location && x.CommunicationType == CommunicationType.LOCATION)
-                .Select(x => x.ContactId).Distinct().ToList();//Same contact filtered.
+                .Select(x => x.ContactId).Distinct().ToList();
 
                 var phoneCountOfLocation = communications.Where(x => contactIdsOfLocation.Contains(x.ContactId) && x.CommunicationType == CommunicationType.PHONE)
-                .Select(x => x.Address).Distinct().Count();//Same phone filtered.
+                .Select(x => x.Address).Distinct().Count();
 
                 contactStatistics.Add(new ContactStatisticsDto
                 {

@@ -32,7 +32,7 @@ namespace ContactMicroService
             services.AddTransient<IContactContext, ContactContext>();
             services.AddTransient<IContactRepository, ContactRepository>();
             services.AddTransient<ICommunicationRepository, CommunicationRepository>();
-
+            services.AddAutoMapper(typeof(Startup));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ContactMicroService", Version = "v1" });

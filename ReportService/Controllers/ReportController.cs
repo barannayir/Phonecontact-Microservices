@@ -2,6 +2,7 @@
 using ReportService.Entities;
 using ReportService.Entities.Dtos;
 using ReportService.Repositories.Interfaces;
+using Shared.BaseController;
 using System.Threading.Tasks;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -10,7 +11,7 @@ namespace ReportService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ReportController : ControllerBase
+    public class ReportController : CustomBaseController
     {
         private readonly IReportRepository _reportService;
         private readonly IRabbitMQPublisherService _rabbitMQPublisherService;
