@@ -38,7 +38,7 @@ namespace ReportService.Repositories
 
         public override Task StartAsync(CancellationToken cancellationToken)
         {
-            Task.Delay(5000).Wait();//Wait for the RabbitMQ to be prepared with Docker
+            Task.Delay(5000).Wait();
             _channel = _rabbitMQClientService.Connect(Constant.ReportQueue, Constant.ReportRouting, Constant.ReportExchange);
             _channel.BasicQos(0, 1, false);
             return base.StartAsync(cancellationToken);
@@ -69,7 +69,7 @@ namespace ReportService.Repositories
 
                 CreateExcel(contactsResponse.Data, path);
 
-                Task.Delay(5000).Wait();// fake trafic
+                Task.Delay(5000).Wait();
 
                 await UpdateReportInformationsAsync(reportEvent, path, ReportStatusType.COMPLETED);
 

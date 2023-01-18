@@ -1,5 +1,6 @@
 using ContactMicroService.Data;
 using ContactMicroService.Data.Interfaces;
+using ContactMicroService.Entities;
 using ContactMicroService.Repositories;
 using ContactMicroService.Repositories.Interfaces;
 using ContactMicroService.Settings;
@@ -28,7 +29,6 @@ namespace ContactMicroService
             services.AddControllers();
             services.Configure<DatabaseSettings>(Configuration.GetSection(nameof(DatabaseSettings)));
             services.AddSingleton<IDatabaseSettings>(sp => sp.GetRequiredService<IOptions<DatabaseSettings>>().Value);
-
             services.AddTransient<IContactContext, ContactContext>();
             services.AddTransient<IContactRepository, ContactRepository>();
             services.AddTransient<ICommunicationRepository, CommunicationRepository>();

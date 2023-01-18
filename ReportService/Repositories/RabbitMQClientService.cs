@@ -16,6 +16,7 @@ namespace ReportService.Repositories
 
         public IModel Connect(string queue, string routing, string exchange)
         {
+           
             _connection = _connectionFactory.CreateConnection();
 
             if (_channel is { IsOpen: true })

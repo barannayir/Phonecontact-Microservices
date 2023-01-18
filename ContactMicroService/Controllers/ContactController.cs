@@ -1,8 +1,11 @@
 ﻿
 
+using ContactMicroService.Entities;
 using ContactMicroService.Entities.Dtos;
+using ContactMicroService.Repositories;
 using ContactMicroService.Repositories.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Shared.BaseController;
 using System.Threading.Tasks;
 
@@ -14,9 +17,12 @@ namespace ContactMicroService.Controllers
     {
         private readonly IContactRepository _contactService;
 
+        private readonly string _contactReportCreateUrl;
+
         public ContactController(IContactRepository contactService)
         {
             _contactService = contactService;
+            
         }
 
         [HttpGet]
@@ -61,5 +67,6 @@ namespace ContactMicroService.Controllers
             var response = await _contactService.GetAllContactWithCommunicationsAsync();
             return CreateActionResultInstance(response);
         }
+
     }
 }

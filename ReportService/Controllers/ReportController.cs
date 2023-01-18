@@ -37,13 +37,26 @@ namespace ReportService.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> CreateReport()
         {
             var response = await _reportService.CreateAsync();
             _rabbitMQPublisherService.Publish(new CreateReportEvent(response.Data.Id),
                 Constant.ReportQueue, Constant.ReportRouting, Constant.ReportExchange);
             return CreateActionResultInstance(response);
         }
+
+        [HttpGet]
+        [Route("CreateReport")]
+        
+        public async Task<IActionResult> CreateReportRestful()
+        {
+            var response = await _reportService.CreateAsync();
+            _rabbitMQPublisherService.Publish(new CreateReportEvent(response.Data.Id),
+                Constant.ReportQueue, Constant.ReportRouting, Constant.ReportExchange);
+            return CreateActionResultInstance(response);
+        }
+
+
 
         [HttpPut]
         public async Task<IActionResult> Update(ReportDto report)
