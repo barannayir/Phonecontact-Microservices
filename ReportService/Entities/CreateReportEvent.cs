@@ -8,7 +8,7 @@ namespace ReportService.Entities
         {
         }
 
-        public CreateReportEvent(int id)
+        public CreateReportEvent(string id)
         {
             ReportId = id;
             var strDateTime = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
@@ -16,6 +16,6 @@ namespace ReportService.Entities
         }
 
         public string ReportName { get; set; }
-        public int ReportId { get; set; }
+        public string ReportId { get; set; }
     }
 }

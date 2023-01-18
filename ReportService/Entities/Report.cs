@@ -1,11 +1,13 @@
-﻿using System;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace ReportService.Entities
 {
     public class Report
     {
-        [Key]
+        [BsonId]
+        [BsonRepresentation(MongoDB.Bson.BsonType.ObjectId)]
         public string Id { get; set; }
 
         public DateTime CreatedDate { get; set; }
