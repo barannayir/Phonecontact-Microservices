@@ -8,7 +8,7 @@ namespace Shared.Dtos
         public T Data { get; set; }
 
         [JsonIgnore]
-        public int StatusCode { get; private set; }
+        public int StatusCode { get; set; }
 
         [JsonIgnore]
         public bool IsSuccessful { get; private set; }
