@@ -22,38 +22,13 @@ namespace ContactTest
 {
     public class ContactControllerTest
     {
-        private readonly IMapper _mockMapper;
-        private readonly ContactRepository _contactRepository;
-        private readonly CommunicationRepository _communicationRepository;
-        
-        public ContactControllerTest()
-        {
-            var dbSettings = new DatabaseSettings
-            {
-                ContactCollectionName = "Contacts",
-                DatabaseName = "ContactDB",
-                ConnectionStrings = "mongodb://localhost:27017",
-                CommunicationCollectionName = "Communications"
-            };
-            _mockMapper = new Mock<IMapper>().Object;
-            var _mockDbSettings = new Mock<IDatabaseSettings>();
-            _mockDbSettings.SetupGet(x => x.ContactCollectionName).Returns(dbSettings.ContactCollectionName);
-            _mockDbSettings.SetupGet(x => x.DatabaseName).Returns(dbSettings.DatabaseName);
-            _mockDbSettings.SetupGet(x => x.ConnectionStrings).Returns(dbSettings.ConnectionStrings);
-            _mockDbSettings.SetupGet(x => x.CommunicationCollectionName).Returns(dbSettings.CommunicationCollectionName);
-            var _mockContactContext = new Mock<IContactContext>();
-            _mockContactContext.SetupGet(x => x.Contacts).Returns(new Mock<IMongoCollection<Contact>>().Object);
-            var _communicationRepository = new CommunicationRepository(_mockMapper, _mockDbSettings.Object);
-            _contactRepository = new ContactRepository(_mockMapper, _mockDbSettings.Object, _communicationRepository);
-            var mockCommunicationService = new Mock<ICommunicationRepository>().Object;
-        }
-
+        private readonly Mock<IContactRepository> _mockRepo = new Mock<IContactRepository>();
+        private readonly Mock<IMapper> _mockMapper = new Mock<IMapper>();
         [Fact]
-        public async Task Create_return_ok()
+        public async Task Create_success()
         {
             //Arrange
-            var mockRepo = new Mock<IContactRepository>();
-            var _mockMapper = new Mock<IMapper>();
+
 
             var contactDtos = new ContactCreateDto
             {
@@ -69,8 +44,8 @@ namespace ContactTest
             };
             var response = new Response<ContactDto> { Data = newContact };
             _mockMapper.Setup(x => x.Map<ContactDto>(It.IsAny<Contact>())).Returns(newContact);
-            mockRepo.Setup(repo => repo.CreateAsync(contactDtos)).ReturnsAsync(response);
-            var _controller = new ContactController(mockRepo.Object);
+            _mockRepo.Setup(repo => repo.CreateAsync(contactDtos)).ReturnsAsync(response);
+            var _controller = new ContactController(_mockRepo.Object);
 
             //Act
             var result = await _controller.Create(contactDtos) as ObjectResult;
@@ -84,11 +59,9 @@ namespace ContactTest
 
 
         [Fact]
-        public async Task GetAll_return_ok()
+        public async Task GetAll_success()
         {
             //Arrange
-            var mockRepo = new Mock<IContactRepository>();
-            var _mockMapper = new Mock<IMapper>();
 
             var contactDtos = new List<ContactDto>
  {
@@ -101,8 +74,8 @@ namespace ContactTest
     };
             _mockMapper.Setup(x => x.Map<List<ContactDto>>(It.IsAny<List<Contact>>())).Returns(contactDtos);
             var response = new Response<List<ContactDto>> { Data = contactDtos };
-            mockRepo.Setup(repo => repo.GetAllAsync()).ReturnsAsync(response);
-            var _controller = new ContactController(mockRepo.Object);
+            _mockRepo.Setup(repo => repo.GetAllAsync()).ReturnsAsync(response);
+            var _controller = new ContactController(_mockRepo.Object);
 
             //Act
             var result = await _controller.GetAll();
@@ -114,11 +87,9 @@ namespace ContactTest
             Assert.Equal(contactDtos, responseData.Data);
         }
         [Fact]
-        public async Task GetContactById_return_ok()
+        public async Task GetContactById_success()
         {
             //Arrange
-            var mockRepo = new Mock<IContactRepository>();
-            var _mockMapper = new Mock<IMapper>();
 
             var contactDto = new ContactWithCommunicationsDto
             {
@@ -131,9 +102,9 @@ namespace ContactTest
 
             _mockMapper.Setup(x => x.Map<ContactWithCommunicationsDto>(It.IsAny<Contact>())).Returns(contactDto);
 
-            mockRepo.Setup(repo => repo.GetById(contactDto.Id)).ReturnsAsync(Response<ContactWithCommunicationsDto>.Success(contactDto, 200));
+            _mockRepo.Setup(repo => repo.GetById(contactDto.Id)).ReturnsAsync(Response<ContactWithCommunicationsDto>.Success(contactDto, 200));
 
-            var _controller = new ContactController(mockRepo.Object);
+            var _controller = new ContactController(_mockRepo.Object);
 
             //Act
             var result = await _controller.GetById(contactDto.Id) as ObjectResult;
@@ -147,31 +118,5 @@ namespace ContactTest
             Assert.Equal(1, responseData.Communications.Count);
         }
 
-
-
-            private List<Contact> GetFakeContact()
-        {
-            return new List<Contact>
-            {
-                new()
-                {
-                    FirstName = "TestFirstName",
-                    LastName = "TestLastName",
-                    Company = "TestCompany"
-                }, new()
-                {
-                    FirstName = "TestFirstName2",
-                    LastName = "TestLastName2",
-                    Company = "TestCompany2"
-                }, new()
-                {
-                    FirstName = "TestFirstName3",
-                    LastName = "TestLastName3",
-                    Company = "TestCompany3"
-                }
-
-            };
-
-        }
     }
 }

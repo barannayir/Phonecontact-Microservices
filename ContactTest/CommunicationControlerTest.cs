@@ -22,20 +22,12 @@ namespace ContactTest
 {
     public class CommunicationControlerTest
     {
-        private readonly IMapper _mockMapper;
-        private readonly ContactRepository _contactRepository;
-        private readonly CommunicationRepository _communicationRepository;
-        
-        public CommunicationControlerTest()
-        {
-          
-        }
+        private readonly Mock<ICommunicationRepository> _mockRepo = new Mock<ICommunicationRepository>();
+        private readonly Mock<IMapper> _mockMapper = new Mock<IMapper>();
         [Fact]
-        public async Task GetAll_return_ok()
+        public async Task GetAll_success()
         {
             //Arrange
-            var mockRepo = new Mock<ICommunicationRepository>();
-            var _mockMapper = new Mock<IMapper>();
 
             var communications = new List<CommunicationDto>
  {
@@ -44,8 +36,8 @@ new CommunicationDto { CommunicationType = CommunicationType.PHONE, Address = "5
     };
             _mockMapper.Setup(x => x.Map<List<CommunicationDto>>(It.IsAny<List<Communication>>())).Returns(communications);
             var response = new Response<List<CommunicationDto>> { Data = communications };
-            mockRepo.Setup(repo => repo.GetAllAsync()).ReturnsAsync(response);
-            var _controller = new CommunicationController(mockRepo.Object);
+            _mockRepo.Setup(repo => repo.GetAllAsync()).ReturnsAsync(response);
+            var _controller = new CommunicationController(_mockRepo.Object);
 
             //Act
             var result = await _controller.GetAll();
@@ -57,14 +49,10 @@ new CommunicationDto { CommunicationType = CommunicationType.PHONE, Address = "5
             Assert.Equal(communications, responseData.Data);
         }
 
-
-
         [Fact]
-        public async Task GetAllById_return_ok()
+        public async Task GetAllById_success()
         {
             //Arrange
-            var mockRepo = new Mock<ICommunicationRepository>();
-            var _mockMapper = new Mock<IMapper>();
             var communicationId = "test_communication_id";
 
             var communication = new CommunicationDto
@@ -75,8 +63,8 @@ new CommunicationDto { CommunicationType = CommunicationType.PHONE, Address = "5
             };
             _mockMapper.Setup(x => x.Map<CommunicationDto>(It.IsAny<Communication>())).Returns(communication);
             var response = new Response<CommunicationDto> { Data = communication };
-            mockRepo.Setup(repo => repo.GetByIdAsync(communicationId)).ReturnsAsync(response);
-            var _controller = new CommunicationController(mockRepo.Object);
+            _mockRepo.Setup(repo => repo.GetByIdAsync(communicationId)).ReturnsAsync(response);
+            var _controller = new CommunicationController(_mockRepo.Object);
 
             //Act
             var result = await _controller.GetById(communicationId);
@@ -89,11 +77,9 @@ new CommunicationDto { CommunicationType = CommunicationType.PHONE, Address = "5
         }
 
         [Fact]
-        public async Task Create_return_ok()
+        public async Task Create_success()
         {
             //Arrange
-            var mockRepo = new Mock<ICommunicationRepository>();
-            var _mockMapper = new Mock<IMapper>();
 
             var communication = new CommunicationCreateDto
             {
@@ -107,8 +93,8 @@ new CommunicationDto { CommunicationType = CommunicationType.PHONE, Address = "5
             };
             var response = new Response<CommunicationDto> { Data = newCommunication };
             _mockMapper.Setup(x => x.Map<CommunicationDto>(It.IsAny<Communication>())).Returns(newCommunication);
-            mockRepo.Setup(repo => repo.CreateAsync(communication)).ReturnsAsync(response);
-            var _controller = new CommunicationController(mockRepo.Object);
+            _mockRepo.Setup(repo => repo.CreateAsync(communication)).ReturnsAsync(response);
+            var _controller = new CommunicationController(_mockRepo.Object);
 
             //Act
             var result = await _controller.Create(communication) as ObjectResult;
