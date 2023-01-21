@@ -77,6 +77,23 @@ new CommunicationDto { CommunicationType = CommunicationType.PHONE, Address = "5
         }
 
         [Fact]
+        public async Task Update_success()
+        {
+            //Arrange
+            var communicationDto = FakeCommunication();
+            var response = new Response<NoContent> { Data = new NoContent(), StatusCode = 204 };
+            _mockRepo.Setup(repo => repo.UpdateAsync(communicationDto)).ReturnsAsync(response);
+            var _controller = new CommunicationController(_mockRepo.Object);
+            //Act
+            var result = await _controller.Update(communicationDto) as ObjectResult;
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.Equal(204, result.StatusCode);
+            Assert.IsType<Response<NoContent>>(result.Value);
+        }
+
+        [Fact]
         public async Task Create_success()
         {
             //Arrange
@@ -106,5 +123,14 @@ new CommunicationDto { CommunicationType = CommunicationType.PHONE, Address = "5
             Assert.Equal(responseData.Address, communication.Address);
         }
 
+        private CommunicationUpdateDto FakeCommunication()
+        {
+            return new CommunicationUpdateDto
+            {
+                Id = "test_communication_id",
+                CommunicationType = CommunicationType.EMAIL,
+                Address = "test@gmail.com"
+            };
+        }
     }
 }

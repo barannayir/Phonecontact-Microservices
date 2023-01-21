@@ -118,5 +118,30 @@ namespace ContactTest
             Assert.Equal(1, responseData.Communications.Count);
         }
 
+        [Fact]
+        public async Task Update_success()
+        {
+            //Arrange
+
+            var contactDto = new ContactUpdateDto
+            {
+                FirstName = "TestFirstName",
+                LastName = "TestLastName",
+                Company = "TestCompany"
+            };
+
+            var response = new Response<NoContent> { Data = new NoContent(), StatusCode = 204 };
+            _mockRepo.Setup(repo => repo.UpdateAsync(contactDto)).ReturnsAsync(response);
+            var _controller = new ContactController(_mockRepo.Object);
+
+            //Act
+            var result = await _controller.Update(contactDto) as ObjectResult;
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.Equal(204, result.StatusCode);
+            Assert.IsType<Response<NoContent>>(result.Value);
+        }
+
     }
 }
