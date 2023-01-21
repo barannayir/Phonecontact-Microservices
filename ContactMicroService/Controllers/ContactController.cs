@@ -17,7 +17,6 @@ namespace ContactMicroService.Controllers
     {
         private readonly IContactRepository _contactService;
 
-        private readonly string _contactReportCreateUrl;
 
         public ContactController(IContactRepository contactService)
         {

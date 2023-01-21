@@ -45,16 +45,6 @@ namespace ReportService.Controllers
             return CreateActionResultInstance(response);
         }
 
-        [HttpGet]
-        [Route("CreateReport")]
-        
-        public async Task<IActionResult> CreateReportRestful()
-        {
-            var response = await _reportService.CreateAsync();
-            _rabbitMQPublisherService.Publish(new CreateReportEvent(response.Data.Id),
-                Constant.ReportQueue, Constant.ReportRouting, Constant.ReportExchange);
-            return CreateActionResultInstance(response);
-        }
 
 
 
